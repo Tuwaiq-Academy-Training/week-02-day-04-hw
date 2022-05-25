@@ -1,0 +1,464 @@
+///// class car
+package com.example.homeworkspring.controoller;
+
+import com.example.homeworkspring.model.Car;
+import com.example.homeworkspring.model.RequstApi;
+import com.example.homeworkspring.servise.Carservise;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+
+@RestController
+@RequestMapping("api/v1/car")
+@RequiredArgsConstructor
+public class CarControoller {
+
+
+    private final Carservise carservise;
+
+    @GetMapping
+    public ResponseEntity<ArrayList<Car>> getCars() {
+
+        return ResponseEntity.status(200).body(carservise.getCars());
+    }
+
+    @PostMapping
+    public ResponseEntity<RequstApi> addCars(@RequestBody @Valid Car car, Errors errors) {
+        if (errors.hasErrors()) {
+            return ResponseEntity.status(400).body(new RequstApi("invalid", 400));
+        }
+
+        boolean ischeck = carservise.addCar(car);
+        if (!ischeck) {
+            return ResponseEntity.status(400).body(new RequstApi("error", 400));
+        }
+        return ResponseEntity.status(200).body(new RequstApi("add new car", 200));
+
+    }
+
+    @PutMapping("/buycar")
+    public ResponseEntity<RequstApi> buyCar(@RequestParam String userid, @RequestParam String carid, @RequestParam double balnce) {
+        Integer buyStatus = carservise.buyCar(userid, carid, balnce);
+
+        switch (buyStatus) {
+            case -1:
+                return ResponseEntity.status(400).body(new RequstApi("Userid is not valid", 400));
+            case 0:
+                return ResponseEntity.status(400).body(new RequstApi("car id is not valid", 400));
+            case 1:
+                return ResponseEntity.status(400).body(new RequstApi("Price is not enough", 400));
+            case 2:
+                return ResponseEntity.status(200).body(new RequstApi("car purchased !", 200));
+            default:
+                return ResponseEntity.status(500).body(new RequstApi("Server error", 500));
+        }
+
+    }
+
+
+    @GetMapping("/type")
+    public ResponseEntity<RequstApi> getCarsByType(@PathVariable String CraName) {
+        ArrayList<Car> carsType = carservise.getCartype(CraName);
+        if (carsType.size() == 0) {
+            return ResponseEntity.status(400).body(new RequstApi("can't found car type", 400));
+        }
+        return ResponseEntity.status(200).body(new RequstApi("found car type", 200));
+    }
+
+    @PutMapping("/resell")
+    public ResponseEntity<RequstApi> resell(String userid, String carid) {
+        Integer buyStatus = carservise.resell(userid, carid);
+
+        switch (buyStatus) {
+            case -1:
+                return ResponseEntity.status(400).body(new RequstApi("Userid is not valid", 400));
+            case 0:
+                return ResponseEntity.status(400).body(new RequstApi("car id is not valid", 400));
+            case 1:
+                return ResponseEntity.status(400).body(new RequstApi("resell car", 400));
+        }
+          return ResponseEntity.status(500).body(new RequstApi("Server error", 500));
+    }
+}
+///////
+
+
+package com.example.homeworkspring.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+
+@AllArgsConstructor @Data
+public class Car
+{
+    @NotEmpty(message = "id should be requierd")
+    private String id;
+    @NotEmpty(message = "car type should be requierd") @Pattern(regexp="(Sedan |SUV| Truck)")
+    private String carType;
+    private double price;
+    private String model;
+    private int stock;
+}
+//////
+package com.example.homeworkspring.servise;
+
+import com.example.homeworkspring.model.Car;
+import com.example.homeworkspring.model.User;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+@Service
+@RequiredArgsConstructor
+public class Carservise {
+    private ArrayList<Car> cars=new ArrayList();
+private Carservise carservise;
+private Userservise userservise;
+    public ArrayList<Car> getCars(){
+        return cars;
+    }
+
+    public boolean addCar(Car car) {
+        return cars.add(car);
+    }
+    public Car getCar(String carid){
+        for (Car car:cars) {
+            if(car.getId().equals(carid)){
+                return car;
+            }
+        }
+        return null;
+    }
+
+    public Integer buyCar(String userid, String carid, double balnce) {
+        User currentUser=userservise.getUser(userid);
+        Car currentCar=carservise.getCar(carid);
+        if(currentUser==null){
+            return -1;
+        }
+        if(currentCar==null){
+            return 0;
+        }
+
+        if(!(balnce >= currentCar.getPrice())){
+        currentCar.setStock(currentCar.getStock()-1);
+          balnce=balnce-currentCar.getPrice();
+            return 1;
+        }
+        Logsservise.addLog("id ="+currentUser.getId(),"The user : " + " "+currentUser.getId()+" Bought the Car: "+ currentCar.getId());
+        return 2;
+
+    }
+
+    public ArrayList<Car> getCartype(String CarName) {
+        if(userservise.getUser()==null){
+            return null;}
+        ArrayList<Car> carsByType = new ArrayList<>();
+        for(Car c : cars) {
+            if (c.getCarType().equals(CarName))
+                carsByType.add(c);
+        }
+    return carsByType;
+
+    }
+
+    public Integer resell(String userid, String carid) {
+        User u=userservise.getUser(userid);
+        Car c=carservise.getCar(carid);
+        if(u==null){
+            return -1;
+        }
+        if(c==null){
+            return 0;
+        }
+        c.setStock(c.getStock() + 1);
+        u.setBalance(u.getBalance() + c.getPrice());
+        cars.remove(c);
+        return 1;
+
+
+    }
+
+}
+
+
+/////////
+package com.example.homeworkspring.controoller;
+
+import com.example.homeworkspring.model.Car;
+import com.example.homeworkspring.model.Logs;
+import com.example.homeworkspring.servise.Carservise;
+import com.example.homeworkspring.servise.Logsservise;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+
+@RestController
+@RequestMapping("api/v1/logs")
+@RequiredArgsConstructor
+public class LogsControoller {
+
+
+    private final Logsservise logsservise;
+
+  @GetMapping
+    public ResponseEntity<ArrayList<Logs>> getLogs(){
+      return ResponseEntity.status(200).body(logsservise.getLogs());
+    }
+
+}
+
+///////
+
+
+package com.example.homeworkspring.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+
+@AllArgsConstructor @Data
+public class Logs
+{
+    @NotEmpty(message = "id should be requierd")
+    private String id;
+    @NotEmpty(message = "message type should be requierd")
+    private String message;
+}
+///////
+package com.example.homeworkspring.servise;
+
+import com.example.homeworkspring.model.Car;
+import com.example.homeworkspring.model.Logs;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+
+@Service
+@RequiredArgsConstructor
+public class Logsservise {
+    private static ArrayList<Logs> logs=new ArrayList();
+
+    public ArrayList<Logs> getLogs(){
+        return  logs;
+    }
+
+    public static boolean addLog(String id, String message){
+        Logs log=new Logs(id,message);
+        return logs.add(log);
+    }
+}
+
+////////
+package com.example.homeworkspring.controoller;
+
+import com.example.homeworkspring.model.Car;
+import com.example.homeworkspring.model.Order;
+import com.example.homeworkspring.servise.Carservise;
+import com.example.homeworkspring.servise.Orderservise;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+
+@RestController
+@RequestMapping("api/v1/order")
+@RequiredArgsConstructor
+public class OrderControoller {
+
+
+    private final Orderservise orderservise;
+
+  @GetMapping
+    public ResponseEntity<ArrayList<Order>>getOrder(){
+      return ResponseEntity.status(200).body(orderservise.getOrders());
+    }
+
+}
+///////
+
+
+package com.example.homeworkspring.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+
+@AllArgsConstructor @Data
+public class Order
+{
+    @NotEmpty(message = "id should be requierd")
+    private String id;
+    @NotEmpty(message = "user id should be requierd")
+    private String userid;
+    @NotEmpty(message = "car id should be requierd")
+    private String carID;
+
+}
+///////
+package com.example.homeworkspring.servise;
+
+import com.example.homeworkspring.model.Car;
+import com.example.homeworkspring.model.Order;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+
+@Service
+@RequiredArgsConstructor
+public class Orderservise {
+    private ArrayList<Order> orders=new ArrayList();
+
+    public ArrayList<Order> getOrders(){
+
+        return orders;
+    }
+
+    public boolean addOrder(Order order) {
+
+        return orders.add(order);
+    }
+
+}
+//////////
+
+package com.example.homeworkspring.controoller;
+
+import com.example.homeworkspring.model.Car;
+import com.example.homeworkspring.model.RequstApi;
+import com.example.homeworkspring.model.User;
+import com.example.homeworkspring.servise.Carservise;
+import com.example.homeworkspring.servise.Orderservise;
+import com.example.homeworkspring.servise.Userservise;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+
+@RestController
+@RequestMapping("api/v1/user")
+@RequiredArgsConstructor
+public class UserControoller {
+
+
+    private final Userservise userservise;
+
+  @GetMapping
+    public ResponseEntity<ArrayList<User>> getOrder(){
+        return ResponseEntity.status(200).body(userservise.getUser());
+    }
+    @PostMapping
+    public ResponseEntity<RequstApi> addUser(@RequestBody @Valid User user, Errors errors) {
+
+        if(errors.hasErrors()){
+            return ResponseEntity.status(400).body(new RequstApi(errors.getFieldError().getDefaultMessage(),400));
+        }
+
+        boolean isUserAdded=userservise.addUser(user);
+
+        if(!isUserAdded){
+            return ResponseEntity.status(500).body(new RequstApi("Error adding a user",500));
+
+        }
+
+        return ResponseEntity.status(200).body(new RequstApi("New user added",200));
+    }
+
+}
+
+
+/////////
+
+package com.example.homeworkspring.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import java.util.ArrayList;
+
+@AllArgsConstructor @Data
+public class User
+{
+    @NotEmpty(message = "id should be requierd")
+    private String id;
+    @NotEmpty(message = "username should be requierd")
+    private String username;
+    @NotEmpty(message = "password should be requierd")
+    private String password;
+    @NotNull(message = "balance should be requierd")
+    private double balance;
+    @NotEmpty(message = "owned should be requierd")
+    private ArrayList<Car>owned;
+}
+///////
+
+
+package com.example.homeworkspring.servise;
+
+import com.example.homeworkspring.controoller.CarControoller;
+import com.example.homeworkspring.model.Car;
+import com.example.homeworkspring.model.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+
+@Service
+@RequiredArgsConstructor
+public class Userservise {
+    private ArrayList<User> users = new ArrayList();
+
+    public ArrayList<User> getUser() {
+        return users;
+    }
+
+    public boolean addUser(User user) {
+
+        return users.add(user);
+    }
+
+    public ResponseEntity<ArrayList<Car> >owned(String id) {
+        CarControoller cars=null;
+        for (User us : users) {
+            if (us.getId().equals(id)) {
+                return cars.getCars();
+            }}
+return null;
+    }
+    public User getUser(String userid) {
+        for (User user:users) {
+            if(user.getId().equals(userid)){
+                return user;
+            }
+        }
+        return null;
+    }
+}
