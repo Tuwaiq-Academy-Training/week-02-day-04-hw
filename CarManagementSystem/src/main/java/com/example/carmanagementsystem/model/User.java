@@ -1,6 +1,7 @@
 package com.example.carmanagementsystem.model;
 
 import com.example.carmanagementsystem.service.CarService;
+import com.example.carmanagementsystem.service.UserService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +13,8 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 
-@AllArgsConstructor @Data
+//@AllArgsConstructor
+@Data
 public class User {
     private final CarService carService;
     @NotEmpty(message = "userID is required!")
@@ -29,9 +31,19 @@ public class User {
     @JsonIgnore
     private ArrayList<Car> carsOwned;
 
-    @JsonIgnore
+    public User (String userID, String username,String password,Double balance) {
+        carService = new CarService(new UserService());
+        this.userID = userID;
+        this.username = username;
+        this.password = password;
+        this.balance = balance;
+        this.carsOwned = new ArrayList<>();
+    }
+
+
     public void addNewCar(Car car) {
         carsOwned.add(car);
+        System.out.println(carsOwned);
     }
 
     public void removeCar(Car car) {

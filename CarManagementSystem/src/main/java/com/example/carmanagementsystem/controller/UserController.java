@@ -4,14 +4,15 @@ package com.example.carmanagementsystem.controller;
 import com.example.carmanagementsystem.model.Log;
 import com.example.carmanagementsystem.model.Order;
 import com.example.carmanagementsystem.model.ResponseAPI;
+import com.example.carmanagementsystem.model.User;
 import com.example.carmanagementsystem.service.CarService;
 import com.example.carmanagementsystem.service.LogService;
+import com.example.carmanagementsystem.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping( "api/v1/user")
@@ -19,6 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final CarService carService;
     private final LogService logService;
+    private final UserService userService;
+
+    @GetMapping
+    public ResponseEntity<ArrayList<User>> getAllUsers() {
+        return ResponseEntity.status(200).body(userService.getUsers());
+    }
 
     @PutMapping("/sellCar/{carid}/{userid}")
     public ResponseEntity<ResponseAPI> sellCar(@PathVariable String carid, @PathVariable String userid) {

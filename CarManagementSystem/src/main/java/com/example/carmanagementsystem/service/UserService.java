@@ -40,4 +40,8 @@ public class UserService {
         }
         return -1;
     }
+
+    public ArrayList<User> getUsers() {
+        return users;
+    }
 }

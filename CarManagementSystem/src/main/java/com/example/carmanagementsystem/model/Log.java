@@ -7,13 +7,13 @@ import java.time.LocalDate;
 
 @Data
 public class Log {
-    private static Integer ID;
+    private static Integer ID =0;
     private Order orderMessage;
     private String message;
     private LocalDate localDate;
 
     public Log(String message, Order orderMessage) {
-        this.ID += ID;
+        Log.ID ++;
         this.message = message;
         this.orderMessage = orderMessage;
         this.localDate = LocalDate.now();

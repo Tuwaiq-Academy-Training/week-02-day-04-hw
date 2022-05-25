@@ -5,12 +5,12 @@ import lombok.Data;
 
  @Data
 public class Order {
-    private static Integer ID;
+    private static Integer ID =0;
     private String userID;
     private String carID;
 
     public Order(String userID, String carID) {
-        this.ID += 1;
+        Order.ID ++;
         this.userID = userID;
         this.carID = carID;
     }
