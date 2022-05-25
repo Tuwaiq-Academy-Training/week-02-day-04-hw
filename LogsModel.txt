@@ -1,0 +1,10 @@
+package com.example.demo.Modele;
+
+import javax.validation.constraints.NotEmpty;
+
+public class Logs {
+    @NotEmpty(message = "Most Be id")
+    private Integer ID;
+    @NotEmpty(message = "Most Be message")
+    private String message;
+}

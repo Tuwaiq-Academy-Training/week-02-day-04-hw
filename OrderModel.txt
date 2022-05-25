@@ -1,0 +1,13 @@
+package com.example.demo.Modele;
+
+import javax.validation.constraints.NotEmpty;
+
+public class Order {
+    @NotEmpty(message = "Most Be id")
+    private Integer ID;
+    @NotEmpty(message = "Most Be userID")
+    private String userID;
+    @NotEmpty(message = "Most Be carID")
+    private String carID;
+
+}

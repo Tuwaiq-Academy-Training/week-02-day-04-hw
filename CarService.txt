@@ -1,0 +1,31 @@
+package com.example.demo.Service;
+
+
+import com.example.demo.Controller.Car;
+import com.example.demo.Controller.User;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+
+@Service
+public class CarService {
+    private ArrayList<User> car=new ArrayList();
+
+    public ArrayList<User> getUsers(){
+        return  car;
+    }
+
+    public boolean addUser(Car car) {
+        return car.add(car);
+    }
+
+    public User getUser(String userid) {
+        for (Car car:cars) {
+            if(car.getId().equals(userid)){
+                return car;
+            }
+        }
+        return null;
+    }
+
+}

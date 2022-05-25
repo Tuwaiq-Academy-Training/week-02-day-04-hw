@@ -1,0 +1,23 @@
+package com.example.demo.Service;
+
+import lombok.extern.java.Log;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+
+public class LogsService {
+
+
+
+    @Service
+    public class LogService {
+        private ArrayList<Log> logs = new ArrayList<>();
+        public ArrayList<Log> getLogs() {
+            return logs;
+        }
+
+        public boolean addLog(Log log) {
+            return logs.add(log);
+        }
+    }
+}

@@ -1,0 +1,16 @@
+package com.example.demo.Modele;
+
+import javax.validation.constraints.NotEmpty;
+
+public class Car {
+    @NotEmpty(message = "Most Be id")
+    private Integer ID;
+    @NotEmpty(message = "Most Be carType")
+    private String carType;
+    @NotEmpty(message = "Most Be price")
+    private String price;
+    @NotEmpty(message = "Most Be moudel")
+    private String moudel;
+    @NotEmpty(message = "Most Be stock")
+    private Integer stock;
+}
