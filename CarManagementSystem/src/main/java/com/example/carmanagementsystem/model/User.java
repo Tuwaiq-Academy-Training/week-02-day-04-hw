@@ -1,19 +1,14 @@
 package com.example.carmanagementsystem.model;
 
 import com.example.carmanagementsystem.service.CarService;
-import com.example.carmanagementsystem.service.UserService;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 
-//@AllArgsConstructor
+@AllArgsConstructor
 @Data
 public class User {
     private final CarService carService;
@@ -28,25 +23,6 @@ public class User {
     private String password;
     @NotNull(message = "balance is required!")
     private Double balance;
-    @JsonIgnore
-    private ArrayList<Car> carsOwned;
+    private ArrayList<UserOwnedCar> carsOwned;
 
-    public User (String userID, String username,String password,Double balance) {
-        carService = new CarService(new UserService());
-        this.userID = userID;
-        this.username = username;
-        this.password = password;
-        this.balance = balance;
-        this.carsOwned = new ArrayList<>();
-    }
-
-
-    public void addNewCar(Car car) {
-        carsOwned.add(car);
-        System.out.println(carsOwned);
-    }
-
-    public void removeCar(Car car) {
-        carsOwned.remove(car);
-    }
 }

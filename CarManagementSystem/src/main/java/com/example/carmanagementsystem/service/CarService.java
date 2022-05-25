@@ -2,6 +2,7 @@ package com.example.carmanagementsystem.service;
 
 import com.example.carmanagementsystem.model.Car;
 import com.example.carmanagementsystem.model.User;
+import com.example.carmanagementsystem.model.UserOwnedCar;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -56,9 +57,19 @@ public class CarService {
         if(user.getBalance() < car.getPrice()) {
             return 2;
         }
+        if(user.getCarsOwned() == null) {
+            user.setBalance(user.getBalance() - car.getPrice());
+            ArrayList<UserOwnedCar> initArr= new ArrayList<>();
+            initArr.add(new UserOwnedCar(car.getCarID(),car.getCarType(),car.getPrice(),car.getModel()));
+            user.setCarsOwned(initArr);
+            car.setStock(car.getStock() - 1);
+            return 3;
+        }
         user.setBalance(user.getBalance() - car.getPrice());
+        ArrayList<UserOwnedCar> carsArr= user.getCarsOwned();
+        carsArr.add(new UserOwnedCar(car.getCarID(),car.getCarType(),car.getPrice(),car.getModel()));
+        user.setCarsOwned(carsArr);
         car.setStock(car.getStock() - 1);
-        user.addNewCar(car);
         return 3;
     }
 
@@ -71,10 +82,11 @@ public class CarService {
         if (user == null) {
             return 0;
         }
-        car.setStock(car.getStock() + 1);
         user.setBalance(user.getBalance() + car.getPrice());
-        user.removeCar(car);
+        car.setStock(car.getStock() + 1);
+        ArrayList<UserOwnedCar> carsArr= user.getCarsOwned();
+        carsArr.remove(new UserOwnedCar(car.getCarID(),car.getCarType(),car.getPrice(),car.getModel()));
+        user.setCarsOwned(carsArr);
         return 1;
-
     }
 }
