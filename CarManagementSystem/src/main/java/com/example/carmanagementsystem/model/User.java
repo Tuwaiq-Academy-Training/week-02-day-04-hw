@@ -4,8 +4,10 @@ import com.example.carmanagementsystem.service.CarService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ public class User {
     @NotEmpty(message = "password is required!")
     @Size(min = 4, message = "should be 4 letters or more")
     private String password;
-    @NotEmpty(message = "balance is required!")
+    @NotNull(message = "balance is required!")
     private Double balance;
     @JsonIgnore
     private ArrayList<Car> carsOwned;

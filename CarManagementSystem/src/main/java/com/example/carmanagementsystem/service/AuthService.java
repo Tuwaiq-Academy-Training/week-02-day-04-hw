@@ -11,15 +11,15 @@ public class AuthService {
     private final UserService userService;
 
     public Boolean register(User user) {
-        if(userService.checkIfUserExist(user.getUserID()) == null) {
+        if(userService.checkIfUserExist(user.getUserID()) != null) {
             return false;
         }
-
         return userService.add(user);
     }
 
     public boolean login(LoginForm loginForm) {
         Integer loginCase = userService.validation(loginForm);
+        System.out.println(loginCase);
         if(loginCase == -1 || loginCase == 0) {
             return false;
         } else if (loginCase == 1) {

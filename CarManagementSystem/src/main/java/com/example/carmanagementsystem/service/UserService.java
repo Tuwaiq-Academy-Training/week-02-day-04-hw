@@ -10,17 +10,14 @@ import java.util.ArrayList;
 public class UserService {
     private ArrayList<User> users = new ArrayList<>();
     
-    public ArrayList<User> getUsers() {
-        return users;
-    }
-    
     public User getUser(String userID) {
+        User curU = null;
         for (User user : users) {
             if(user.getUserID().equals(userID)) {
-                return user;
+                curU = user;
             }
         }
-        return null;
+        return curU;
     }
     
     public User checkIfUserExist(String userID) {
@@ -33,13 +30,14 @@ public class UserService {
     }
 
     public Integer validation(LoginForm loginForm) {
-        User user = checkIfUserExist(loginForm.getUsername());
-        if(user == null){
-            return -1;
+        for(User user : users) {
+            if(user.getUsername().equals(loginForm.getUsername())){
+                if (user.getPassword().equals(loginForm.getPassword())){
+                    return 1;
+                }
+                return 0;
+            }
         }
-        if (!user.getPassword().equals(loginForm.getPassword())) {
-            return 0;
-        }
-        return 1;
+        return -1;
     }
 }
