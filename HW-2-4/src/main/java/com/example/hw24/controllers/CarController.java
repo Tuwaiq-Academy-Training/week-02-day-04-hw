@@ -46,7 +46,7 @@ public class CarController {
 
     }
     @PutMapping("/buy")
-    public ResponseEntity<Api> buyCar(@RequestParam String userid, @RequestParam String carid, @RequestParam Integer price){
+    public ResponseEntity<Api> buyCar(@RequestParam String userid, @RequestParam String carid){
         Integer buyStatus=carService.buyCar(userid,carid,price);
 
         switch (buyStatus){
