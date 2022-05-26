@@ -15,7 +15,7 @@ public class CarService {
     private ArrayList<Car>cars=new ArrayList<Car>();
 
     @NonNull
-    private LogService logService;
+    private final LogService logService;
     public ArrayList<Car> getAllCars(){
         return cars;
     }

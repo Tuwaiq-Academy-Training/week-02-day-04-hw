@@ -8,9 +8,7 @@ import javax.validation.constraints.*;
 import java.util.ArrayList;
 
 
-@AllArgsConstructor
 @Data
-
 public class User {
     @NotEmpty(message = "id is required")
     @Size(min=4)
@@ -28,6 +26,13 @@ public class User {
     @PositiveOrZero(message = "PLease add valid number")
     private Double balance;
 
-    @NonNull
     private ArrayList<Car> userCars;
+
+    public User(String id, String username, String password, Double balance) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.balance = balance;
+        this.userCars = new ArrayList<>();
+    }
 }
