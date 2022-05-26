@@ -23,9 +23,6 @@ public class CarController {
 
     private final  CarService carService;
 
-//    public CarController(CarService carService){
-//        this.carService=carService;
-//    }
 
     @GetMapping
     public ResponseEntity<ArrayList<Car>> getCars(){
