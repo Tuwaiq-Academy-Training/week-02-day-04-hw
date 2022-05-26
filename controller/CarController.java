@@ -1,9 +1,11 @@
-package com.example.car.controller;
+package com.example.cardealershipmanagementsystem.controller;
 
-import com.example.car.model.Car;
-import com.example.car.service.CarService;
+
+import com.example.cardealershipmanagementsystem.models.Api;
+import com.example.cardealershipmanagementsystem.models.Car;
+import com.example.cardealershipmanagementsystem.service.CarService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+
 
 @RestController
 @RequestMapping("api/v1/car")
@@ -26,7 +29,7 @@ public class CarController {
 
     @GetMapping
     public ResponseEntity<ArrayList<Car>> getCars(){
-       return ResponseEntity.status(HttpStatus.OK).body(carService.getCars());
+        return ResponseEntity.status(HttpStatus.OK).body(carService.getCars());
     }
 
     @GetMapping("/{type}")

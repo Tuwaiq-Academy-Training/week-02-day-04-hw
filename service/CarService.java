@@ -1,9 +1,9 @@
-package com.example.car.service;
+package com.example.cardealershipmanagementsystem.service;
 
-import com.example.car.model.Car;
-import com.example.car.model.User;
+
+import com.example.cardealershipmanagementsystem.models.Car;
+import com.example.cardealershipmanagementsystem.models.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class CarService {
         Integer oldBalance=user.getBalance();
         user.setBalance(oldBalance-car.getPrice());
 
-        user.getCarsOwned().add(car);
+        user.getCarsOwneds().add(car);
 
         return 2;
 
@@ -70,12 +70,12 @@ public class CarService {
             return -1;
         }
 
-        if(!user.getCarsOwned().contains(car)){
+        if(!user.getCarsOwneds().contains(car)){
             return 0;
         }
         car.setStock(car.getStock()+1);
         user.setBalance(user.getBalance()+car.getPrice());
-        user.getCarsOwned().remove(car);
+        user.getCarsOwneds().remove(car);
 
         return 1;
 
@@ -91,3 +91,8 @@ public class CarService {
         return null;
     }
 }
+
+
+
+
+
