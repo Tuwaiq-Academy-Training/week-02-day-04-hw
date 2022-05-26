@@ -1,83 +1,112 @@
-package com.example.cardealership.controllers;
+package com.example.cardealership.service;
 
-import com.example.cardealership.model.Api;
+import com.example.cardealership.model.Car;
 import com.example.cardealership.model.Order;
-import com.example.cardealership.service.OrderService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.*;
+import com.example.cardealership.model.User;
+import org.springframework.stereotype.Service;
 
-import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+@Service
+public class OrderService {
+    List<Order> orders = new ArrayList<>();
+    private final CarService carService;
+    private final UserService userService;
 
-@RestController
-@RequestMapping("/order")
-public class OrderController {
-    private OrderService orderService;
 
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
+    public OrderService(CarService carService, UserService userService) {
+        this.carService = carService;
+        this.userService = userService;
+    }
+    public List<Order> getOrders(){
+        return orders;
     }
 
-    /**
-     * Get all the domain data.
-     */
-    @GetMapping()
-    public ResponseEntity<List> getOrder() {
-        return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrders());
+    public void updateRide(Order order, Order o){
+        order.setUserid(o.getUserid());
+        order.setCarid(o.getCarid());
     }
-    /**
-     * Get a specific data by passing an id.
-     *
-     * @param id id of the data
-     */
-    @GetMapping("{id}")
-    ResponseEntity<Object> getOrderByID(@PathVariable String id) {
-        if (!orderService.isOrderByID(id)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Api("Not Found, no ride with that id", HttpStatus.BAD_REQUEST));
+
+    public boolean deleteOrder(String id){
+
+        if (isOrderByID(id)){
+            Order order = getById(id);
+            getOrders().remove(order);
+            return true;
         }
-        return ResponseEntity.status(HttpStatus.OK).body(orderService.getById(id));
+        return false;
     }
 
-    @PostMapping ("/purchase")
-    ResponseEntity<Api> purchase(@RequestBody @Valid Order p, Errors errors) {
-        try {
-            check(errors);
-            return (orderService.purchaseCar(p)) ? ResponseEntity.status(HttpStatus.CREATED).body(new Api("car purchased successfully!", HttpStatus.CREATED)) :
-                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Api("purchase was NOT successful!!", HttpStatus.INTERNAL_SERVER_ERROR));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Api(e.getMessage(), HttpStatus.BAD_REQUEST));
+    public boolean isOrderByID(String id){
+        int checkForWork = -1;
+        Order order = getById(id);
+        if (order != null){
+            checkForWork = Integer.parseInt(id);
         }
-    }
-    @PostMapping ("/resell")
-    ResponseEntity<Api> resell(@RequestBody @Valid Order p, Errors errors) {
-        try {
-            check(errors);
-            return (orderService.resellCar(p)) ? ResponseEntity.status(HttpStatus.CREATED).body(new Api("car resold successfully!", HttpStatus.CREATED)) :
-                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Api("resell was NOT successful!!", HttpStatus.INTERNAL_SERVER_ERROR));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Api(e.getMessage(), HttpStatus.BAD_REQUEST));
-        }
+        return (checkForWork == -1) ? false :  true;
     }
 
-    /**
-     * Delete a data by passing an id.
-     *
-     * @param id id of the data
-     */
-    @DeleteMapping("{id}")
-    public ResponseEntity<Api> deleteOrder(@PathVariable String id) {
-        boolean status;
-        status = orderService.deleteOrder(id);
-        return (!status) ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Api("No data found!", HttpStatus.BAD_REQUEST))
-                : ResponseEntity.status(HttpStatus.OK).body(new Api("Successfully deleted!", HttpStatus.OK));
+
+    public boolean addOrder(Order order){
+        return orders.add(order);
+    }
+    public  Order getById(String id){
+        for (Order order: this.orders) {
+            if (order.getId().equals(id)){
+                return order;
+            }
+        }
+        return null;
     }
 
-    public void check(Errors errors) throws IllegalArgumentException {
-        if (errors.hasErrors()) {
-            String error = errors.getFieldError().getDefaultMessage();
-            throw new IllegalArgumentException(error);
+    public boolean purchaseCar(Order o) {
+        User user = userService.getById(o.getUserid());
+        Car car = carService.getById(o.getCarid());
+        if (user == null || car == null ){
+            return false;
         }
+        if (user.getBalance()<=car.getPrice() || car.getStock() <=0){
+            return false;
+        }
+        if (user.getCarsOwned() != null){
+            user.getCarsOwned().add(car);
+            car.setStock(car.getStock()-1);
+            user.setBalance(user.getBalance()-car.getPrice());
+            orders.add(o);
+            return true;
+        }
+        ArrayList<Car> userCarsOwned = new ArrayList<>();
+        userCarsOwned.add(car);
+        user.setCarsOwned(userCarsOwned);
+        car.setStock(car.getStock()-1);
+        user.setBalance(user.getBalance()-car.getPrice());
+        orders.add(o);
+        return true;
+    }
+    public boolean resellCar(Order o) {
+        User user = userService.getById(o.getUserid());
+        Car car = carService.getById(o.getCarid());
+        if (user == null || car == null ){
+            return false;
+        }
+
+        if (user.getCarsOwned() != null && isCarOwned(user,car)){
+            user.getCarsOwned().remove(car);
+            car.setStock(car.getStock()+1);
+            user.setBalance(user.getBalance()+car.getPrice());
+            orders.add(o);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isCarOwned(User user, Car car){
+        for (Car c: user.getCarsOwned()) {
+            if (c.getId().equals(car.getId())){
+                return true;
+            }
+        }
+        return false;
     }
 }
