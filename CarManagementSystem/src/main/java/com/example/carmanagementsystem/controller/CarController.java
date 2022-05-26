@@ -31,9 +31,9 @@ public class CarController {
         if(errors.hasErrors()) {
             return ResponseEntity.status(400).body(new ResponseAPI(errors.getFieldError().getDefaultMessage(),400));
         }
-        boolean isCarAdded = carService.addCar(car);
-        if (!isCarAdded) {
-            return ResponseEntity.status(500).body(new ResponseAPI("Server error!",500));
+        Integer isCarAdded = carService.addCar(car);
+        if (isCarAdded == 1) {
+            return ResponseEntity.status(500).body(new ResponseAPI("Car already registered!",500));
         }
         return ResponseEntity.status(201).body(new ResponseAPI("Car addded successfully!",201));
     }
@@ -45,7 +45,7 @@ public class CarController {
         //look for car if there's add new
         boolean isCarAdded = carService.editCar(car);
         if (!isCarAdded) {
-            return ResponseEntity.status(500).body(new ResponseAPI("Server error!",500));
+            return ResponseEntity.status(500).body(new ResponseAPI("Car doesn't exists!",500));
         }
         return ResponseEntity.status(201).body(new ResponseAPI("Car edited successfully!",201));
     }

@@ -18,8 +18,21 @@ public class CarService {
         return cars;
     }
 
-    public boolean addCar(Car car ) {
-        return cars.add(car);
+    public Integer addCar(Car car ) {
+        if(isCarExist(car)) {
+            return 1;
+        }
+        cars.add(car);
+        return 2;
+    }
+
+    private boolean isCarExist(Car car) {
+        for (Car carIN: cars) {
+            if (car.getCarID().equals(carIN.getCarID())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public ArrayList<Car> getCarsByType(String carType) {
@@ -70,7 +83,9 @@ public class CarService {
         if(user.getBalance() < car.getPrice()) {
             return 2;
         }
+        System.out.println("user.getCarsOwned(): "+user.getCarsOwned());
         if(user.getCarsOwned() == null) {
+            System.out.println("it's null");
             user.setBalance(user.getBalance() - car.getPrice());
             ArrayList<UserOwnedCar> initArr= new ArrayList<>();
             initArr.add(new UserOwnedCar(car.getCarID(),car.getCarType(),car.getPrice(),car.getModel()));

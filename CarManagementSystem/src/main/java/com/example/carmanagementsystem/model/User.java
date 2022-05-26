@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 
-@AllArgsConstructor
+//@AllArgsConstructor
 @Data
 public class User {
     private final CarService carService;
@@ -25,4 +25,12 @@ public class User {
     private Double balance;
     private ArrayList<UserOwnedCar> carsOwned;
 
+    public User(CarService carService, String userID, String username, String password, Double balance, ArrayList<UserOwnedCar> carsOwned) {
+        this.carService = carService;
+        this.userID = userID;
+        this.username = username;
+        this.password = password;
+        this.balance = balance;
+        this.carsOwned = new ArrayList<>();
+    }
 }
