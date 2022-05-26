@@ -17,6 +17,13 @@ public class User {
     @NotEmpty(message = "Password is required")
     @Size(min=6 , max = 20)
     private String password;
-    private Integer balance=0;
+    private Integer balance;
     private ArrayList<Car> carsowen;
+    public User(String id, String username, String password, Integer balance) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.balance = balance;
+        this.carsowen = new ArrayList<>();
+    }
 }
