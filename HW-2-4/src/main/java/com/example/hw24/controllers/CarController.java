@@ -19,11 +19,11 @@ public class CarController {
     private final CarService carService;
 
     @GetMapping
-    public ResponseEntity<ArrayList<Car>> getBooks(){
+    public ResponseEntity<ArrayList<Car>> getCar(){
         return ResponseEntity.status(200).body(carService.getCar());
     }
     @PostMapping
-    public ResponseEntity<Api> addUser(@RequestBody @Valid Car car, Errors errors) {
+    public ResponseEntity<Api> addCar(@RequestBody @Valid Car car, Errors errors) {
 
         if (errors.hasErrors()) {
             return ResponseEntity.status(400).body(new Api(errors.getFieldError().getDefaultMessage(), 400));
@@ -46,7 +46,7 @@ public class CarController {
 
     }
     @PutMapping("/buy")
-    public ResponseEntity<Api> buyBook(@RequestParam String userid, @RequestParam String carid, @RequestParam Integer price){
+    public ResponseEntity<Api> buyCar(@RequestParam String userid, @RequestParam String carid, @RequestParam Integer price){
         Integer buyStatus=carService.buyCar(userid,carid,price);
 
         switch (buyStatus){
