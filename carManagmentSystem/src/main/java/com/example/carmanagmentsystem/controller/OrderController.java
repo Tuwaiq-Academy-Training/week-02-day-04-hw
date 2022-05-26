@@ -13,10 +13,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class OrderController {
 
-    @NonNull
     private final OrderService orderService;
 
-    @NonNull
     private final LogService logService;
 
     @PutMapping("purchasecar/{userid}/{carid}")

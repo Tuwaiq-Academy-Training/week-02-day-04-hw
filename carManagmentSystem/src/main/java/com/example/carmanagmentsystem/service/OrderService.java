@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OrderService {
 
-    @NonNull
+
     private final UserService userService;
-    @NonNull
+
     private final CarService carService;
-    @NonNull
+
     private final LogService logService;
 
     public boolean purchaseCar(String carId , String userId){
@@ -41,12 +41,17 @@ public class OrderService {
 
         if(currentUser==null || currentCar==null){ return false; }
 
-        currentUser.setBalance(currentUser.getBalance()+currentCar.getPrice());
-        currentUser.getUserCars().remove(currentCar);
-        currentCar.setStock(currentCar.getStock()+1);
+        for (int i = 0; i < currentUser.getUserCars().size(); i++) {
+            if (currentUser.getUserCars().get(i).equals(currentCar)){
+                currentUser.setBalance(currentUser.getBalance()+currentCar.getPrice());
+                currentUser.getUserCars().remove(currentCar);
+                currentCar.setStock(currentCar.getStock()+1);
+                logService.addLog(currentUser.getId()+ " has been re-sell "+currentCar.getId());
+                return true;
+            }
+        }
+        return false;
 
-        logService.addLog(currentUser.getId()+ " has been re-sell "+currentCar.getId());
-        return true;
     }
 
     public Integer getUser(String userId){

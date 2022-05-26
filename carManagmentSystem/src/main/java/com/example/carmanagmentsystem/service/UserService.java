@@ -12,7 +12,7 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class UserService {
 
-    @NonNull private final LogService logService;
+    private final LogService logService;
     private ArrayList<User> users=new ArrayList();
 
     public ArrayList<User> getUsers(){
