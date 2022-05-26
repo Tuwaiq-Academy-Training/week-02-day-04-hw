@@ -17,10 +17,6 @@ public class OrderService {
     public OrderService(CarService carService, UserService userService) {
         this.carService = carService;
         this.userService = userService;
-//        this.orders.addAll(List.of( new Order("1","101", "103")));
-//        String userid = userService.users.get(1).getId();
-//        String carid = carService.cars.get(1).getId();
-//        orders.add(new Order("1",userid, carid));
     }
     public List<Order> getOrders(){
         return orders;
@@ -86,27 +82,31 @@ public class OrderService {
         user.setBalance(user.getBalance()-car.getPrice());
         orders.add(o);
         return true;
-    }public boolean resellCar(Order o) {
+    }
+    public boolean resellCar(Order o) {
         User user = userService.getById(o.getUserid());
         Car car = carService.getById(o.getCarid());
         if (user == null || car == null ){
             return false;
         }
 
-        if (user.getCarsOwned() != null){
-
+        if (user.getCarsOwned() != null && isCarOwned(user,car)){
             user.getCarsOwned().remove(car);
             car.setStock(car.getStock()+1);
             user.setBalance(user.getBalance()+car.getPrice());
             orders.add(o);
             return true;
         }
-//        ArrayList<Car> userCarsOwned = new ArrayList<>();
-//        userCarsOwned.add(car);
-//        user.setCarsOwned(userCarsOwned);
-//        car.setStock(car.getStock()-1);
-//        user.setBalance(user.getBalance()-car.getPrice());
-//        orders.add(o);
+
+        return false;
+    }
+
+    public boolean isCarOwned(User user, Car car){
+        for (Car c: user.getCarsOwned()) {
+            if (c.getId().equals(car.getId())){
+                return true;
+            }
+        }
         return false;
     }
 }
