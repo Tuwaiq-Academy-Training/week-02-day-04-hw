@@ -37,6 +37,18 @@ public class CarController {
         }
         return ResponseEntity.status(201).body(new ResponseAPI("Car addded successfully!",201));
     }
+    @PutMapping
+    public ResponseEntity<ResponseAPI> editCar(@RequestBody @Valid Car car, Errors errors){
+        if(errors.hasErrors()) {
+            return ResponseEntity.status(400).body(new ResponseAPI(errors.getFieldError().getDefaultMessage(),400));
+        }
+        //look for car if there's add new
+        boolean isCarAdded = carService.editCar(car);
+        if (!isCarAdded) {
+            return ResponseEntity.status(500).body(new ResponseAPI("Server error!",500));
+        }
+        return ResponseEntity.status(201).body(new ResponseAPI("Car edited successfully!",201));
+    }
 
     @GetMapping("/{carType}")
     public ResponseEntity<Object> getCarsByType(@PathVariable String carType) {

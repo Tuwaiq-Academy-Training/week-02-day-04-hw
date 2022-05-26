@@ -36,6 +36,8 @@ public class UserController {
             case 0:
                 return ResponseEntity.status(400).body(new ResponseAPI("userid doesn't exists!",400));
             case 1:
+                return ResponseEntity.status(400).body(new ResponseAPI("car doesn't exists!",400));
+            case 2:
                 logService.addLog(new Log(String.format("Car: %s has been re-sold by %s",carid,userid),new Order(carid,userid)));
                 return ResponseEntity.status(400).body(new ResponseAPI("car is sold!",400));
         }

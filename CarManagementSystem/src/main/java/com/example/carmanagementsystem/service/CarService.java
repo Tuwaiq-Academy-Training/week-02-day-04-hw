@@ -31,6 +31,19 @@ public class CarService {
         }
         return carsByType;
     }
+    public boolean editCar(Car car) {
+        if(checkIfCarExists(car.getCarID()) == null) {
+            return false;
+        }
+
+        for (int i = 0; i < cars.size(); i++) {
+            if(car.getCarID().equals(cars.get(i).getCarID())){
+                cars.set(i,car);
+                return true;
+            }
+        }
+        return false;
+    }
 
     public Car checkIfCarExists(String carid) {
         for(Car car : cars) {
@@ -82,11 +95,15 @@ public class CarService {
         if (user == null) {
             return 0;
         }
+        if(user.getCarsOwned().size() == 0) {
+            return 1;//doesn't have car
+        }
         user.setBalance(user.getBalance() + car.getPrice());
         car.setStock(car.getStock() + 1);
         ArrayList<UserOwnedCar> carsArr= user.getCarsOwned();
         carsArr.remove(new UserOwnedCar(car.getCarID(),car.getCarType(),car.getPrice(),car.getModel()));
         user.setCarsOwned(carsArr);
-        return 1;
+        return 2;
     }
+
 }
