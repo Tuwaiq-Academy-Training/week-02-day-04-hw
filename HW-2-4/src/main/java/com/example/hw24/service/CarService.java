@@ -45,7 +45,7 @@ public class CarService {
         }
         return null;
     }
-    public Integer buyCar(String userid, String carid, Integer price) {
+    public Integer buyCar(String userid, String carid) {
         User currentUser=userService.getUser(userid);
         Car currentCar=getCar(carid);
         if(currentUser==null){
@@ -55,7 +55,7 @@ public class CarService {
             return 0;
         }
 
-        if(!(price >= currentCar.getPrice())){
+         if(!(currentUser.getBalance() >= currentCar.getPrice())){
             return 1;
         }
         currentUser.setBalance(currentUser.getBalance()-currentCar.getPrice());
