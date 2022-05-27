@@ -1,15 +1,14 @@
-package com.example.car.service;
+package com.example.car.User;
 
-import com.example.car.model.Car;
-import com.example.car.model.User;
+import com.example.car.Car.Car;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
 @Service
 public class UserService {
-    private ArrayList<User> userList=new ArrayList<>();
 
+    private ArrayList<User> userList = new ArrayList<>();
     public ArrayList<User> getUsers(){
         return userList;
     }
@@ -18,9 +17,9 @@ public class UserService {
         return userList.add(newUser);
     }
 
-    public User getUser(String userid) {
-        for (User user:userList) {
-            if(user.getId().equals(userid)){
+    public User getUser(String userid){
+        for (User user:userList){
+            if (user.getID().equals(userid)){
                 return user;
             }
         }
