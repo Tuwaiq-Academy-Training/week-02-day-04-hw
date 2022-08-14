@@ -5,9 +5,6 @@ Create Car dealership management system
 Car Class:
 ID, carType, price, model, stock
 
-Order class:
-ID, userid, carID
-
 User Class:
 ID, username, password, balance, arrayList(cars owned)
 
